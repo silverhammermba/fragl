@@ -157,9 +157,9 @@ int main()
 				steps -= 1;
 
 		glm::mat4 transform;
-		transform = glm::rotate(transform, theta, glm::vec3(0.f, 0.f, 1.f));
 		transform = glm::translate(transform, translate);
 		transform = glm::scale(transform, glm::vec3(scale, scale, 1.f));
+		transform = glm::rotate(transform, theta, glm::vec3(0.f, 0.f, 1.f));
 		camera_u.set(transform);
 
 		steps_u.set(steps);

@@ -97,7 +97,6 @@ int main()
 	program.use();
 
 	GL::Uniform camera_u(program, "camera_transform");
-	GL::Uniform perspective_u(program, "perspective_transform");
 
 	glm::vec3 translate(0.f, 0.f, 0.f);
 	glm::vec3 xt(1.f, 0.f, 0.f);
@@ -105,9 +104,6 @@ int main()
 
 	float theta = 0.f;
 	float scale = 1.f;
-
-	glm::mat4 perspective;// = glm::perspective(90.0f, width / (float)height, 1.0f, 45.0f);
-	perspective_u.set(perspective);
 
 	GL::Attribute position(program, "position");
 

@@ -97,6 +97,7 @@ int main()
 	program.use();
 
 	GL::Uniform camera_u(program, "camera_transform");
+	GL::Uniform steps_u(program, "steps");
 
 	glm::vec3 translate(0.f, 0.f, 0.f);
 	glm::vec3 xt(1.f, 0.f, 0.f);
@@ -104,6 +105,8 @@ int main()
 
 	float theta = 0.f;
 	float scale = 1.f;
+
+	int steps = 1;
 
 	GL::Attribute position(program, "position");
 
@@ -147,12 +150,19 @@ int main()
 			scale /= (1 + diff);
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 			scale *= (1 + diff);
+		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+			steps += 1;
+		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+			if (steps > 1)
+				steps -= 1;
 
 		glm::mat4 transform;
 		transform = glm::rotate(transform, theta, glm::vec3(0.f, 0.f, 1.f));
 		transform = glm::translate(transform, translate);
 		transform = glm::scale(transform, glm::vec3(scale, scale, 1.f));
 		camera_u.set(transform);
+
+		steps_u.set(steps);
 
 		// clear screen
 		GL::clear_color();

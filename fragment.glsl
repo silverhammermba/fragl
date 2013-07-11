@@ -4,8 +4,7 @@ in vec2 Position;
 
 out vec4 outColor;
 
-const int steps = 32;
-const float grade = 1.0 / steps;
+uniform int steps;
 
 vec2 complex_square(vec2 v)
 {
@@ -19,6 +18,8 @@ float abs_squared(vec2 v)
 
 void main()
 {
+	float grade = 1.0 / steps;
+
 	outColor = vec4(1.0, 1.0, 1.0, 1.0);
 
 	vec2 z = Position;

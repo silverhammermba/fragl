@@ -104,9 +104,9 @@ int main()
 	glm::vec3 yt(0.f, 1.f, 0.f);
 
 	float theta = 0.f;
-	float scale = 1.f;
+	float scale = 2.f;
 
-	int steps = 1;
+	int steps = 16;
 
 	GL::Attribute position(program, "position");
 
@@ -152,7 +152,7 @@ int main()
 			scale *= (1 + diff);
 		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 			steps += 1;
-		if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 			if (steps > 1)
 				steps -= 1;
 

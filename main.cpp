@@ -67,10 +67,10 @@ int main()
 	}
 
 	float surface[] = {
-		-1.0f,  1.0f,
-		 1.0f,  1.0f,
-		 1.0f, -1.0f,
-		-1.0f, -1.0f
+		-1.f,  1.f,
+		 1.f,  1.f,
+		 1.f, -1.f,
+		-1.f, -1.f
 	};
 
 	GLshort elements[] = {
@@ -96,6 +96,19 @@ int main()
 
 	program.use();
 
+	GL::Uniform camera_u(program, "camera_transform");
+	GL::Uniform perspective_u(program, "perspective_transform");
+
+	glm::vec3 translate(0.f, 0.f, 0.f);
+	glm::vec3 xt(1.f, 0.f, 0.f);
+	glm::vec3 yt(0.f, 1.f, 0.f);
+
+	float theta = 0.f;
+	float scale = 1.f;
+
+	glm::mat4 perspective;// = glm::perspective(90.0f, width / (float)height, 1.0f, 45.0f);
+	perspective_u.set(perspective);
+
 	GL::Attribute position(program, "position");
 
 	GLuint vao;
@@ -109,11 +122,41 @@ int main()
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
+	double elapsed = 0.0;
+	float diff = 0.f;
+	double last = 0.0;
+
 	// input/display loop
 	while (!glfwWindowShouldClose(window))
 	{
+		elapsed = glfwGetTime();
+		diff = elapsed - last;
+		last = elapsed;
+
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, GL_TRUE);
+		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+			translate += yt * diff * scale;
+		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+			translate -= yt * diff * scale;
+		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+			translate += xt * diff * scale;
+		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+			translate -= xt * diff * scale;
+		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+			theta += 45 * diff;
+		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+			theta -= 45 * diff;
+		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+			scale /= (1 + diff);
+		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+			scale *= (1 + diff);
+
+		glm::mat4 transform;
+		transform = glm::rotate(transform, theta, glm::vec3(0.f, 0.f, 1.f));
+		transform = glm::translate(transform, translate);
+		transform = glm::scale(transform, glm::vec3(scale, scale, 1.f));
+		camera_u.set(transform);
 
 		// clear screen
 		GL::clear_color();

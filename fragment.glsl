@@ -30,6 +30,6 @@ void main()
 			break;
 		}
 
-		z = complex_square(z) + z;
+		z = complex_square(z) + Position;
 	}
 }

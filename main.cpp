@@ -44,12 +44,11 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	unsigned int width = 800;
-	unsigned int height = 600;
+	unsigned int width = 1600;
+	unsigned int height = 900;
 
 	// create window
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-	GLFWwindow* window = glfwCreateWindow(width, height, "OpenGL", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(width, height, "OpenGL", glfwGetPrimaryMonitor(), nullptr);
 
 	if (window == nullptr)
 	{
@@ -156,10 +155,22 @@ int main()
 			if (steps > 1)
 				steps -= 1;
 
+		// STR - scale by 0, rotate by center, move by grid
+		// RTS - scale by center, rotate by 0, move by view
+		// TRS - scale/rotate by center, move by grid
+		// TSR - same as TRS
+		// SRT - scale/rotate by 0, move by view
+		// RST - same as SRT
+
+		// TODO get translation to be scale/rotation dependent, but make scale/rotation also translation dependent
 		glm::mat4 transform;
 		transform = glm::translate(transform, translate);
-		transform = glm::scale(transform, glm::vec3(scale, scale, 1.f));
 		transform = glm::rotate(transform, theta, glm::vec3(0.f, 0.f, 1.f));
+		transform = glm::scale(transform, glm::vec3(scale, scale, 1.f));
+
+		// correct for aspect ratio
+		transform = glm::scale(transform, glm::vec3(width / (float)height, 1.f, 1.f));
+
 		camera_u.set(transform);
 
 		steps_u.set(steps);

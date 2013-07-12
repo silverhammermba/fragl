@@ -131,16 +131,18 @@ int main()
 		diff = elapsed - last;
 		last = elapsed;
 
+		glm::vec3 delta(0.f, 0.f, 0.f);
+
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, GL_TRUE);
 		if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-			translate += yt * diff * scale;
+			delta += yt * diff * scale;
 		if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-			translate -= yt * diff * scale;
+			delta -= yt * diff * scale;
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-			translate += xt * diff * scale;
+			delta += xt * diff * scale;
 		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-			translate -= xt * diff * scale;
+			delta -= xt * diff * scale;
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 			theta += 45 * diff;
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
@@ -155,14 +157,9 @@ int main()
 			if (steps > 1)
 				steps -= 1;
 
-		// STR - scale by 0, rotate by center, move by grid
-		// RTS - scale by center, rotate by 0, move by view
-		// TRS - scale/rotate by center, move by grid
-		// TSR - same as TRS
-		// SRT - scale/rotate by 0, move by view
-		// RST - same as SRT
+		// TODO refactor the shit out of this
+		translate += glm::vec3((glm::rotate(glm::mat4(), theta, glm::vec3(0.f, 0.f, 1.f)) * glm::vec4(delta, 1.f)));
 
-		// TODO get translation to be scale/rotation dependent, but make scale/rotation also translation dependent
 		glm::mat4 transform;
 		transform = glm::translate(transform, translate);
 		transform = glm::rotate(transform, theta, glm::vec3(0.f, 0.f, 1.f));

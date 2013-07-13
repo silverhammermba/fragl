@@ -156,6 +156,8 @@ int main()
 		else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 			if (steps > 1)
 				steps -= 1;
+		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+			cerr << scale << endl;
 
 		// TODO refactor the shit out of this
 		translate += glm::vec3((glm::rotate(glm::mat4(), theta, glm::vec3(0.f, 0.f, 1.f)) * glm::vec4(delta, 1.f)));

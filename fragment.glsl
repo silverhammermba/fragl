@@ -27,7 +27,8 @@ void main()
 	{
 		if (abs_squared(z) > 4.0)
 		{
-			outColor = vec4(grade * i, grade * i, grade * i, 1.0);
+			float grade = 1.0 - log(log(sqrt(abs_squared(z))/log(2.0)));
+			outColor = vec4(grade, grade, grade, 1.0);
 			break;
 		}
 

@@ -7,15 +7,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../moogl/moogl.hpp"
-
 using std::cerr;
 using std::endl;
 
-std::string read_file(const std::string& filename)
+char* read_file(const std::string& filename)
 {
-	std::string contents;
-
 	std::ifstream in(filename);
 	if (!in)
 	{
@@ -23,9 +19,14 @@ std::string read_file(const std::string& filename)
 	}
 
 	in.seekg(0, std::ios::end);
-	contents.resize(in.tellg());
+
+	int size = in.tellg();
+
+	char* contents = new char[size + 1];
+	contents[size] = '\0';
+
 	in.seekg(0, std::ios::beg);
-	in.read(&contents[0], contents.size());
+	in.read(contents, size);
 	in.close();
 
 	return contents;
@@ -88,15 +89,27 @@ int main()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
 	// create program
-	GL::Program program {
-		GL::Shader(GL::Shader::Vertex, read_file("vertex.glsl")),
-		GL::Shader(GL::Shader::Fragment, read_file("fragment.glsl"))
-	};
+	GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+	char* vertex_source = read_file("vertex.glsl");
+	glShaderSource(vertex_shader, 1, &vertex_source, nullptr);
+	glCompileShader(vertex_shader);
+	delete[] vertex_source;
 
-	program.use();
+	GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+	char* fragment_source = read_file("fragment.glsl");
+	glShaderSource(fragment_shader, 1, &fragment_source, nullptr);
+	glCompileShader(fragment_shader);
+	delete[] fragment_source;
 
-	GL::Uniform camera_u(program, "camera_transform");
-	GL::Uniform steps_u(program, "steps");
+	GLuint program = glCreateProgram();
+	glAttachShader(program, vertex_shader);
+	glAttachShader(program, fragment_shader);
+
+	glLinkProgram(program);
+	glUseProgram(program);
+
+	GLint camera_u = glGetUniformLocation(program, "camera_transform");
+	GLint steps_u = glGetUniformLocation(program, "steps");
 
 	glm::vec3 translate(0.f, 0.f, 0.f);
 	glm::vec3 xt(1.f, 0.f, 0.f);
@@ -105,16 +118,16 @@ int main()
 	float theta = 0.f;
 	float scale = 2.f;
 
-	int steps = 16;
+	int steps = 40;
 
-	GL::Attribute position(program, "position");
+	GLint position = glGetAttribLocation(program, "position");
 
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	position.enable();
-	position.layout<float>(2, false, 0, 0);
+	glEnableVertexAttribArray(position);
+	glVertexAttribPointer(position, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -170,12 +183,11 @@ int main()
 		// correct for aspect ratio
 		transform = glm::scale(transform, glm::vec3(width / (float)height, 1.f, 1.f));
 
-		camera_u.set(transform);
-
-		steps_u.set(steps);
+		glUniformMatrix4fv(camera_u, 1, GL_FALSE, glm::value_ptr(transform));
+		glUniform1i(steps_u, steps);
 
 		// clear screen
-		GL::clear_color();
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
